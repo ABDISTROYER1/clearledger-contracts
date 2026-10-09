@@ -24,11 +24,11 @@ use crate::{
     TTL_EXTEND_TO, TTL_THRESHOLD,
 };
 
-use trusttrove_escrow::{EscrowContract as RealEscrow, EscrowContractClient as RealEscrowClient};
-use trusttrove_invoice::{
+use clearledger_escrow::{EscrowContract as RealEscrow, EscrowContractClient as RealEscrowClient};
+use clearledger_invoice::{
     InvoiceContract as RealInvoice, InvoiceContractClient as RealInvoiceClient,
 };
-use trusttrove_test_utils::{
+use clearledger_test_utils::{
     setup_full_protocol, test_agent_id, test_agent_pubkey, test_agent_signing_key,
 };
 
@@ -43,7 +43,7 @@ const DEFAULT_FUNDED_AMOUNT: u128 =
 // SEP-41 share metadata every test initializer passes to `initialize` (issue
 // #757). Kept as constants so the assertions in the metadata tests and the
 // `initialize` call sites cannot drift apart.
-const TEST_SHARE_NAME: &str = "TrusTrove USDC Pool Shares";
+const TEST_SHARE_NAME: &str = "ClearLedger USDC Pool Shares";
 const TEST_SHARE_SYMBOL: &str = "TT-USDC";
 const DEFAULT_YIELD_AMOUNT: u128 = DEFAULT_FACE_VALUE * DEFAULT_DISCOUNT_BPS as u128 / 10000;
 
@@ -94,11 +94,11 @@ pub struct MockAgentRegistry;
 
 #[contractimpl]
 impl MockAgentRegistry {
-    pub fn get_agent(env: Env, agent_id: Symbol) -> Option<trusttrove_invoice::Agent> {
+    pub fn get_agent(env: Env, agent_id: Symbol) -> Option<clearledger_invoice::Agent> {
         env.storage().persistent().get(&AgentKey(agent_id))
     }
 
-    pub fn register_agent(env: Env, agent_id: Symbol, agent: trusttrove_invoice::Agent) {
+    pub fn register_agent(env: Env, agent_id: Symbol, agent: clearledger_invoice::Agent) {
         env.storage().persistent().set(&AgentKey(agent_id), &agent);
     }
 }
@@ -106,16 +106,16 @@ impl MockAgentRegistry {
 #[contracttype]
 pub struct AgentKey(Symbol);
 
-// Shared test_agent helpers imported from trusttrove_test_utils (Issue #813)
+// Shared test_agent helpers imported from clearledger_test_utils (Issue #813)
 
 /// Submits a validly signed attestation for `invoice_id` against the
 /// agent-registry wired up in `setup()`, unlocking it for
 /// `list_for_financing`.
 fn attest_invoice(te: &TestEnv, invoice_id: &BytesN<32>) {
-    let payload = trusttrove_invoice::AttestationPayload {
+    let payload = clearledger_invoice::AttestationPayload {
         domain_separator: BytesN::from_array(
             &te.env,
-            &trusttrove_invoice::ATTESTATION_DOMAIN_SEPARATOR,
+            &clearledger_invoice::ATTESTATION_DOMAIN_SEPARATOR,
         ),
         invoice_id: invoice_id.clone(),
         risk_score: 5000,
@@ -349,7 +349,7 @@ fn setup() -> TestEnv {
     let agent_registry = MockAgentRegistryClient::new(&env, &agent_registry_id);
     agent_registry.register_agent(
         &test_agent_id(&env),
-        &trusttrove_invoice::Agent {
+        &clearledger_invoice::Agent {
             active: true,
             pubkey: test_agent_pubkey(&env),
         },
@@ -1016,7 +1016,7 @@ fn test_revocation_after_funding_does_not_block_lifecycle() {
     assert!(te.invoice.repay(&invoice_id));
 
     let invoice = te.invoice.get(&invoice_id);
-    assert_eq!(invoice.status, trusttrove_invoice::InvoiceStatus::Repaid);
+    assert_eq!(invoice.status, clearledger_invoice::InvoiceStatus::Repaid);
 
     let stats = te.pool.get_stats();
     assert_eq!(stats.active_invoice_count, 0);
@@ -2245,8 +2245,8 @@ fn test_handle_default_active_count_underflow_panics() {
     // EscrowDefaultNotReleased guard first.
     te.env.as_contract(&te.escrow_id, || {
         te.env.storage().persistent().set(
-            &trusttrove_escrow::DataKey::Locked(phantom_id.clone()),
-            &trusttrove_escrow::EscrowRecord {
+            &clearledger_escrow::DataKey::Locked(phantom_id.clone()),
+            &clearledger_escrow::EscrowRecord {
                 invoice_id: phantom_id.clone(),
                 amount: funded_amount,
                 locked_at: te.env.ledger().timestamp(),
@@ -2523,7 +2523,7 @@ fn test_handle_default_rejects_when_escrow_reports_no_release() {
     // Simulate escrow's lock record having already been removed out of band,
     // so escrow.handle_default() hits its `return false` path instead of
     // transferring funds.
-    let locked_key = trusttrove_escrow::DataKey::Locked(invoice_id.clone());
+    let locked_key = clearledger_escrow::DataKey::Locked(invoice_id.clone());
     te.env.as_contract(&te.escrow_id, || {
         te.env.storage().persistent().remove(&locked_key);
     });
@@ -3273,7 +3273,7 @@ fn test_fund_invoice_after_repayment_panics() {
     let invoice_id = fund_and_repay_invoice(&te);
     assert_eq!(
         te.invoice.get(&invoice_id).status,
-        trusttrove_invoice::InvoiceStatus::Repaid
+        clearledger_invoice::InvoiceStatus::Repaid
     );
 
     te.pool.fund_invoice(&invoice_id);
@@ -3296,7 +3296,7 @@ fn test_fund_invoice_after_default_panics() {
     assert!(te.pool.handle_default(&invoice_id));
     assert_eq!(
         te.invoice.get(&invoice_id).status,
-        trusttrove_invoice::InvoiceStatus::Defaulted
+        clearledger_invoice::InvoiceStatus::Defaulted
     );
 
     te.pool.fund_invoice(&invoice_id);
@@ -3655,7 +3655,7 @@ fn test_fund_invoice_before_initialize_panics() {
 mod real_registry_integration {
     use super::*;
     use soroban_sdk::{map, Map, String};
-    use trusttrove_registry::{
+    use clearledger_registry::{
         RegistryContract as RealRegistry, RegistryContractClient as RealRegistryClient,
         VerificationStatus,
     };
@@ -3750,7 +3750,7 @@ mod real_registry_integration {
         let agent_registry = MockAgentRegistryClient::new(&env, &agent_registry_id);
         agent_registry.register_agent(
             &test_agent_id(&env),
-            &trusttrove_invoice::Agent {
+            &clearledger_invoice::Agent {
                 active: true,
                 pubkey: test_agent_pubkey(&env),
             },
@@ -3785,10 +3785,10 @@ mod real_registry_integration {
 
         let invoice_id = invoice.create(&issuer, &buyer, &face_value, &due_date, &usdc_id);
 
-        let payload = trusttrove_invoice::AttestationPayload {
+        let payload = clearledger_invoice::AttestationPayload {
             domain_separator: BytesN::from_array(
                 &env,
-                &trusttrove_invoice::ATTESTATION_DOMAIN_SEPARATOR,
+                &clearledger_invoice::ATTESTATION_DOMAIN_SEPARATOR,
             ),
             invoice_id: invoice_id.clone(),
             risk_score: 5000,
@@ -3853,10 +3853,10 @@ mod real_registry_integration {
         let second_due_date = env.ledger().timestamp() + 86400;
         let second_invoice_id =
             invoice.create(&issuer, &buyer, &face_value, &second_due_date, &usdc_id);
-        let second_payload = trusttrove_invoice::AttestationPayload {
+        let second_payload = clearledger_invoice::AttestationPayload {
             domain_separator: BytesN::from_array(
                 &env,
-                &trusttrove_invoice::ATTESTATION_DOMAIN_SEPARATOR,
+                &clearledger_invoice::ATTESTATION_DOMAIN_SEPARATOR,
             ),
             invoice_id: second_invoice_id.clone(),
             risk_score: 5000,
@@ -3913,19 +3913,19 @@ mod real_registry_integration {
         assert!(pool.fund_invoice(&second_invoice_id));
 
         let record = invoice.get(&invoice_id);
-        assert_eq!(record.status, trusttrove_invoice::InvoiceStatus::Funded);
+        assert_eq!(record.status, clearledger_invoice::InvoiceStatus::Funded);
 
         invoice.mark_shipped(&invoice_id);
         invoice.confirm_delivery(&invoice_id, &issuer);
         invoice.confirm_delivery(&invoice_id, &buyer);
 
         let record = invoice.get(&invoice_id);
-        assert_eq!(record.status, trusttrove_invoice::InvoiceStatus::Confirmed);
+        assert_eq!(record.status, clearledger_invoice::InvoiceStatus::Confirmed);
 
         invoice.repay(&invoice_id);
 
         let record = invoice.get(&invoice_id);
-        assert_eq!(record.status, trusttrove_invoice::InvoiceStatus::Repaid);
+        assert_eq!(record.status, clearledger_invoice::InvoiceStatus::Repaid);
     }
 
     #[test]
@@ -5245,14 +5245,14 @@ fn test_share_metadata_is_scoped_to_the_pool_instance() {
         &registry_id,
         &admin,
         &DEFAULT_MIN_INITIAL_DEPOSIT,
-        &String::from_str(&env, "TrusTrove XLM Pool Shares"),
+        &String::from_str(&env, "ClearLedger XLM Pool Shares"),
         &String::from_str(&env, "TT-XLM"),
         &12,
     );
 
     assert_eq!(
         pool.name(),
-        String::from_str(&env, "TrusTrove XLM Pool Shares")
+        String::from_str(&env, "ClearLedger XLM Pool Shares")
     );
     assert_eq!(pool.symbol(), String::from_str(&env, "TT-XLM"));
     // A non-7 value proves decimals is per-instance state, not a constant.
@@ -5282,7 +5282,7 @@ fn test_initialize_rejects_empty_share_symbol() {
         &registry_id,
         &admin,
         &DEFAULT_MIN_INITIAL_DEPOSIT,
-        &String::from_str(&env, "TrusTrove USDC Pool Shares"),
+        &String::from_str(&env, "ClearLedger USDC Pool Shares"),
         &String::from_str(&env, ""),
         &DEFAULT_SHARE_DECIMALS,
     );

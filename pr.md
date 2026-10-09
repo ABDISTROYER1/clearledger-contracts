@@ -18,5 +18,5 @@ Closes #263, Closes #265, Closes #268, Closes #281
 
 - [x] `cargo fmt --all --check`
 - [x] `cargo clippy --all-targets -- -D warnings` (workspace-wide, no new warnings)
-- [x] `cargo test -p trusttrove-pool` (58 passed, 0 failed)
+- [x] `cargo test -p clearledger-pool` (58 passed, 0 failed)
 - [x] `cargo test --workspace` (194 passed, 0 failed, across registry/invoice/escrow/pool)

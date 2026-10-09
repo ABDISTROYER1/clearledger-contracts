@@ -5,7 +5,7 @@ use soroban_sdk::{
     xdr::{FromXdr, ToXdr},
     Address, Bytes, BytesN, Env, IntoVal, Map, String, Symbol, Vec,
 };
-use trusttrove_pause::{require_not_paused, set_paused};
+use clearledger_pause::{require_not_paused, set_paused};
 
 mod constants;
 mod errors;
@@ -37,7 +37,7 @@ pub const MAX_INVOICE_LIFETIME_SECONDS: u64 = 10 * 365 * 24 * 60 * 60;
 /// the [`AttestationPayload`] they sign. Binds a signature to this
 /// contract's attestation scheme specifically, so it can't be replayed
 /// against an unrelated contract or message format.
-pub const ATTESTATION_DOMAIN_SEPARATOR: [u8; 32] = *b"TrusTrove.InvoiceAttestation.v1_";
+pub const ATTESTATION_DOMAIN_SEPARATOR: [u8; 32] = *b"ClearLedger.InvoiceAttest.v1____";
 
 /// Maximum number of invoices a single paginated `get_by_*` query may return.
 ///
@@ -1163,7 +1163,7 @@ impl InvoiceContract {
     /// Submits a signed risk attestation from a registered Underwrite agent
     /// against an invoice, unlocking it for `list_for_financing`.
     ///
-    /// This is the hook by which TrusTrove calls into Underwrite's
+    /// This is the hook by which ClearLedger calls into Underwrite's
     /// agent-registry contract (a separate product, built in the
     /// `underwrite-contract` repo) — this contract only verifies the
     /// signature and checks the signer against that registry; it does not
@@ -2626,7 +2626,7 @@ impl InvoiceContract {
     ///
     /// # Panics
     /// * `NotInitialized` if the contract has not been initialized.
-    /// * `ContractPaused` (via `trusttrove_pause::require_not_paused`) while
+    /// * `ContractPaused` (via `clearledger_pause::require_not_paused`) while
     ///   the circuit breaker is engaged.
     pub fn transfer_ownership(env: Env, new_admin: Address) {
         require_not_paused(&env);

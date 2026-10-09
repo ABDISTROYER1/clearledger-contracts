@@ -1,7 +1,7 @@
 #![no_std]
 
 use soroban_sdk::{contract, contractimpl, panic_with_error, token, Address, BytesN, Env, Vec};
-use trusttrove_pause::{require_not_paused, set_paused};
+use clearledger_pause::{require_not_paused, set_paused};
 
 mod constants;
 mod errors;

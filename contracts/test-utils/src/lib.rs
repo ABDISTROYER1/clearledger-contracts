@@ -65,24 +65,24 @@ pub struct AgentKey(pub Symbol);
 
 #[contractimpl]
 impl MockAgentRegistry {
-    pub fn get_agent(env: Env, agent_id: Symbol) -> Option<trusttrove_invoice::Agent> {
+    pub fn get_agent(env: Env, agent_id: Symbol) -> Option<clearledger_invoice::Agent> {
         env.storage().persistent().get(&AgentKey(agent_id))
     }
 
-    pub fn register_agent(env: Env, agent_id: Symbol, agent: trusttrove_invoice::Agent) {
+    pub fn register_agent(env: Env, agent_id: Symbol, agent: clearledger_invoice::Agent) {
         env.storage().persistent().set(&AgentKey(agent_id), &agent);
     }
 }
 
 pub struct FullProtocol {
     pub env: Env,
-    pub registry: trusttrove_registry::RegistryContractClient<'static>,
+    pub registry: clearledger_registry::RegistryContractClient<'static>,
     pub registry_id: Address,
-    pub invoice: trusttrove_invoice::InvoiceContractClient<'static>,
+    pub invoice: clearledger_invoice::InvoiceContractClient<'static>,
     pub invoice_id: Address,
-    pub pool: trusttrove_pool::PoolContractClient<'static>,
+    pub pool: clearledger_pool::PoolContractClient<'static>,
     pub pool_id: Address,
-    pub escrow: trusttrove_escrow::EscrowContractClient<'static>,
+    pub escrow: clearledger_escrow::EscrowContractClient<'static>,
     pub escrow_id: Address,
     pub admin: Address,
     pub issuer: Address,
@@ -101,8 +101,8 @@ pub fn setup_full_protocol() -> FullProtocol {
     let lp = Address::generate(&env);
 
     // 1. Registry
-    let registry_id = env.register_contract(None, trusttrove_registry::RegistryContract);
-    let registry = trusttrove_registry::RegistryContractClient::new(&env, &registry_id);
+    let registry_id = env.register_contract(None, clearledger_registry::RegistryContract);
+    let registry = clearledger_registry::RegistryContractClient::new(&env, &registry_id);
     registry.initialize(&admin);
 
     let empty_meta = Map::new(&env);
@@ -125,17 +125,17 @@ pub fn setup_full_protocol() -> FullProtocol {
     });
 
     // 3. Contracts
-    let invoice_id = env.register_contract(None, trusttrove_invoice::InvoiceContract);
-    let escrow_id = env.register_contract(None, trusttrove_escrow::EscrowContract);
-    let pool_id = env.register_contract(None, trusttrove_pool::PoolContract);
+    let invoice_id = env.register_contract(None, clearledger_invoice::InvoiceContract);
+    let escrow_id = env.register_contract(None, clearledger_escrow::EscrowContract);
+    let pool_id = env.register_contract(None, clearledger_pool::PoolContract);
 
-    let invoice = trusttrove_invoice::InvoiceContractClient::new(&env, &invoice_id);
+    let invoice = clearledger_invoice::InvoiceContractClient::new(&env, &invoice_id);
     invoice.initialize(&admin, &registry_id);
 
-    let escrow = trusttrove_escrow::EscrowContractClient::new(&env, &escrow_id);
+    let escrow = clearledger_escrow::EscrowContractClient::new(&env, &escrow_id);
     escrow.initialize(&admin, &pool_id, &usdc_id);
 
-    let pool = trusttrove_pool::PoolContractClient::new(&env, &pool_id);
+    let pool = clearledger_pool::PoolContractClient::new(&env, &pool_id);
     pool.initialize(
         &admin,
         &invoice_id,
@@ -144,7 +144,7 @@ pub fn setup_full_protocol() -> FullProtocol {
         &registry_id,
         &admin,
         &10_000_000,
-        &String::from_str(&env, "TrusTrove USDC Pool Shares"),
+        &String::from_str(&env, "ClearLedger USDC Pool Shares"),
         &String::from_str(&env, "TT-USDC"),
         &7,
     );
@@ -157,7 +157,7 @@ pub fn setup_full_protocol() -> FullProtocol {
     let agent_registry = MockAgentRegistryClient::new(&env, &agent_registry_id);
     agent_registry.register_agent(
         &test_agent_id(&env),
-        &trusttrove_invoice::Agent {
+        &clearledger_invoice::Agent {
             active: true,
             pubkey: test_agent_pubkey(&env),
         },

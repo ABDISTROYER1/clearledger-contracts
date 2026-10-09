@@ -4,7 +4,7 @@ use soroban_sdk::{
     contract, contractimpl, panic_with_error, token, Address, BytesN, Env, IntoVal, String, Symbol,
     Vec,
 };
-use trusttrove_pause::{require_not_paused, set_paused};
+use clearledger_pause::{require_not_paused, set_paused};
 
 mod constants;
 mod errors;
@@ -56,7 +56,7 @@ impl PoolContract {
     ///   different decimals than the original USDC-only pool must scale this
     ///   accordingly rather than reuse `DEFAULT_MIN_INITIAL_DEPOSIT`.
     /// * `share_name` - SEP-41 `name()` of this pool's LP share token, e.g.
-    ///   `"TrusTrove USDC Pool Shares"`. Must be non-empty.
+    ///   `"ClearLedger USDC Pool Shares"`. Must be non-empty.
     /// * `share_symbol` - SEP-41 `symbol()` of this pool's LP share token, e.g.
     ///   `"TT-USDC"`. Must be non-empty.
     /// * `share_decimals` - SEP-41 `decimals()` of this pool's LP share token.
@@ -374,7 +374,7 @@ impl PoolContract {
     ///
     /// # Panics
     /// * `NotInitialized` if the pool has not been initialized.
-    /// * `ContractPaused` (via `trusttrove_pause::require_not_paused`) if the
+    /// * `ContractPaused` (via `clearledger_pause::require_not_paused`) if the
     ///   pool is paused.
     ///
     /// # Example

@@ -1,9 +1,9 @@
-pub const TTL_THRESHOLD: u32 = trusttrove_ttl::THRESHOLD;
-pub const TTL_EXTEND_TO: u32 = trusttrove_ttl::EXTEND_TO;
+pub const TTL_THRESHOLD: u32 = clearledger_ttl::THRESHOLD;
+pub const TTL_EXTEND_TO: u32 = clearledger_ttl::EXTEND_TO;
 
 /// Minimum initial deposit the factory passes to a newly deployed pool
-/// instance's `initialize`. Mirrors `trusttrove_pool::DEFAULT_MIN_INITIAL_DEPOSIT`;
-/// duplicated here rather than imported because `trusttrove-pool` is a
+/// instance's `initialize`. Mirrors `clearledger_pool::DEFAULT_MIN_INITIAL_DEPOSIT`;
+/// duplicated here rather than imported because `clearledger-pool` is a
 /// dev-dependency only (see Cargo.toml), so production code cannot reference
 /// its constants. Callers deploying a pool for an asset with different
 /// decimals than this default assumes should register it via
@@ -24,7 +24,7 @@ pub const DEFAULT_MIN_INITIAL_DEPOSIT: u128 = 10_000_000;
 /// metadata should initialize the pool directly and wire it up with
 /// `register_existing_pool`, which is also [`DEFAULT_MIN_INITIAL_DEPOSIT`]'s
 /// escape hatch.
-pub const DEFAULT_SHARE_NAME: &str = "TrusTrove Pool Shares";
+pub const DEFAULT_SHARE_NAME: &str = "ClearLedger Pool Shares";
 /// See [`DEFAULT_SHARE_NAME`].
 pub const DEFAULT_SHARE_SYMBOL: &str = "TT-POOL";
 /// See [`DEFAULT_SHARE_NAME`]. Matches the 7 decimals that

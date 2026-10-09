@@ -1,7 +1,7 @@
 #![no_std]
 
 //! Shared TTL (time-to-live) constants for all storage entries across the
-//! TrusTrove contract workspace.
+//! ClearLedger contract workspace.
 //!
 //! `THRESHOLD` is the minimum remaining ledger count before an entry is
 //! eligible for extension; `EXTEND_TO` is the ledger count the entry's TTL is

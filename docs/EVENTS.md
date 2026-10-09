@@ -1,6 +1,6 @@
 # Event Catalog
 
-This document lists every event emitted by the TrusTrove smart contracts. Events are published via `env.events().publish(topics, data)` and are indexed by the Go indexer for off-chain consumption.
+This document lists every event emitted by the ClearLedger smart contracts. Events are published via `env.events().publish(topics, data)` and are indexed by the Go indexer for off-chain consumption.
 
 All amounts are in **USDC stroops** (1 USDC = 10,000,000 stroops).  
 All timestamps are **Unix seconds** (u64).  

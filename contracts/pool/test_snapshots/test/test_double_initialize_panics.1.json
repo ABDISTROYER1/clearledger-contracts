@@ -85,7 +85,7 @@
                   }
                 },
                 {
-                  "string": "TrusTrove USDC Pool Shares"
+                  "string": "ClearLedger USDC Pool Shares"
                 },
                 {
                   "string": "TT-USDC"
@@ -613,7 +613,7 @@
                           ]
                         },
                         "val": {
-                          "string": "TrusTrove USDC Pool Shares"
+                          "string": "ClearLedger USDC Pool Shares"
                         }
                       },
                       {
@@ -1128,7 +1128,7 @@
                   }
                 },
                 {
-                  "string": "TrusTrove USDC Pool Shares"
+                  "string": "ClearLedger USDC Pool Shares"
                 },
                 {
                   "string": "TT-USDC"
@@ -1254,7 +1254,7 @@
                                     }
                                   },
                                   {
-                                    "string": "TrusTrove USDC Pool Shares"
+                                    "string": "ClearLedger USDC Pool Shares"
                                   },
                                   {
                                     "string": "TT-USDC"
@@ -1411,7 +1411,7 @@
                   }
                 },
                 {
-                  "string": "TrusTrove USDC Pool Shares"
+                  "string": "ClearLedger USDC Pool Shares"
                 },
                 {
                   "string": "TT-USDC"
@@ -1560,7 +1560,7 @@
                       }
                     },
                     {
-                      "string": "TrusTrove USDC Pool Shares"
+                      "string": "ClearLedger USDC Pool Shares"
                     },
                     {
                       "string": "TT-USDC"

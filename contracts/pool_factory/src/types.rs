@@ -16,7 +16,7 @@ pub enum DataKey {
 }
 
 /// Aggregate, pool-wide accounting snapshot returned by `get_pool_stats`.
-/// This is a verbatim copy of `trusttrove_pool::PoolStats` so the factory
+/// This is a verbatim copy of `clearledger_pool::PoolStats` so the factory
 /// can return it from `get_aggregate_stats` without introducing a cyclic or
 /// bloated dependency on the pool crate.
 #[contracttype]

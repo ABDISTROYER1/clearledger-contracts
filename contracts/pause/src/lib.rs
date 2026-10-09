@@ -1,22 +1,22 @@
 #![no_std]
 
-//! Shared emergency-pause state for all storage entries across the TrusTrove
+//! Shared emergency-pause state for all storage entries across the ClearLedger
 //! contract workspace.
 //!
 //! There is a single process-wide circuit-breaker flag that every contract
 //! consults from its state-changing entry points. Rather than duplicating the
 //! storage key, defaults, and panic behaviour in all four contracts (registry,
 //! invoice, escrow, pool), they share this tiny crate — exactly the pattern
-//! already used by [`trusttrove-ttl`](https://docs.rs/trusttrove-ttl).
+//! already used by [`clearledger-ttl`](https://docs.rs/clearledger-ttl).
 //!
 //! # Usage
 //!
 //! ```ignore
-//! use trusttrove_pause::{require_not_paused, set_paused};
+//! use clearledger_pause::{require_not_paused, set_paused};
 //!
 //! // Guard a state-changing entry point:
 //! pub fn create(env: Env, ..) -> bool {
-//!     trusttrove_pause::require_not_paused(&env);
+//!     clearledger_pause::require_not_paused(&env);
 //!     // .. proceed with the write
 //! }
 //!

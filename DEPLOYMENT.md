@@ -1,7 +1,7 @@
 # Deployment Guide
 
 This document covers prerequisites, deployment flow, contract
-wiring order, verification, and rollback for the TrusTrove
+wiring order, verification, and rollback for the ClearLedger
 smart contracts on Stellar.
 
 ## Prerequisites
@@ -77,13 +77,13 @@ When `--only` is passed, the script:
 ### 3. Post-Deploy Wiring
 
 After `deploy.sh` completes, copy the generated contract IDs
-into the TrusTrove frontend:
+into the ClearLedger frontend:
 
 ```bash
 cat .env.deployed
 ```
 
-Paste the values into `trusttrove-app/.env.local`.
+Paste the values into `clearledger-app/.env.local`.
 
 ## Contract Wiring Order
 
@@ -278,7 +278,7 @@ To manually invalidate old deployments:
 1. Revoke all verified issuers/buyers from the old registry
 2. Pause LP deposits on old pool contracts (when pause is implemented)
 3. Deploy new contracts with `--fresh`
-4. Update `trustrove-app/.env.local` with new addresses
+4. Update `clearledger-app/.env.local` with new addresses
 5. Notify LPs to withdraw from old pools and deposit into new ones
 
 ## Troubleshooting

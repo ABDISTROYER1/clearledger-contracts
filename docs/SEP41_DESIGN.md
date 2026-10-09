@@ -31,4 +31,4 @@ These exact formulas, already present in `contracts/pool/src/lib.rs`, will be pr
 The LP share token's `decimals()` value must be carefully considered.
 
 **Decision:** The LP share token's `decimals()` should match the funding asset's decimals for that specific pool instance. 
-Since TrusTrove now operates under a `pool_factory` + per-asset model, each pool instance works with a single funding asset (e.g., USDC, XLM). By matching the funding asset's decimals, we ensure 1:1 parity in precision when calculating deposits/withdrawals, preventing awkward scaling shifts.
+Since ClearLedger now operates under a `pool_factory` + per-asset model, each pool instance works with a single funding asset (e.g., USDC, XLM). By matching the funding asset's decimals, we ensure 1:1 parity in precision when calculating deposits/withdrawals, preventing awkward scaling shifts.

@@ -1,45 +1,14 @@
-<p align="center">
-  <img src="https://trustrove.vercel.app/og-image.png" alt="TrusTrove Contracts" width="600" />
-</p>
 
 
-<h1 align="center">TrusTrove — Smart Contracts</h1>
+# ClearLedger Soroban Contracts
 
+Soroban contracts for ClearLedger’s Stellar testnet invoice-finance prototype. The workspace contains the participant registry, invoice lifecycle, shared liquidity pools, escrow settlement and supporting test utilities. The pool factory creates independent pool instances per asset.
 
-<p align="center">
-  Soroban smart contracts powering the TrusTrove trade finance protocol on Stellar. 
-  The protocol uses a pool_factory + per-asset pool instance model, allowing independent liquidity pools per asset.
-</p> 
+The contracts coordinate on-chain state and USDC transfers; they do not independently validate off-chain invoices or guarantee funding, repayment or returns.
 
+> **Testnet only.** The contracts are experimental and have not been formally audited. Testnet assets only; never use real funds.
 
-
-
-
-
-<p align="center">
-  <a href="https://github.com/TrusTrove/TrusTrove-contract/actions/workflows/ci.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/TrusTrove/TrusTrove-contract/ci.yml?branch=main&label=build" />
-  </a>
-  <a href="https://codecov.io/gh/TrusTrove/TrusTrove-contract">
-    <img src="https://img.shields.io/codecov/c/github/TrusTrove/TrusTrove-contract?label=coverage" />
-  </a>
-  <img src="https://img.shields.io/badge/rust-1.85.0-orange" />
-  <img src="https://img.shields.io/badge/soroban--sdk-21.7.6-blueviolet" />
-  <img src="https://img.shields.io/badge/network-Stellar%20Testnet-00c9a7" />
-  <img src="https://img.shields.io/github/license/TrusTrove/TrusTrove-contract" />
-</p>
-
-<p align="center">
-  <a href="https://trustrove.vercel.app">Live App</a> ·
-  <a href="https://github.com/TrusTrove/TrusTrove-app">App Repo</a> ·
-  <a href="https://stellar.expert/explorer/testnet">Stellar Explorer</a>
-</p>
-
----
-
-## What is TrusTrove?
-
-TrusTrove is a decentralized trade finance protocol on Stellar. SMEs tokenize unpaid invoices and receive immediate USDC funding from a shared liquidity pool. Liquidity providers deposit USDC and earn yield from discount fees when invoices repay. No banks, no brokers — four Soroban smart contracts handle everything.
+See [contract architecture](docs/NEW_DESIGN.md), [deployment guidance](DEPLOYMENT.md) and [security policy](SECURITY.md). The app and SDK are maintained in a companion repository. Explore the current testnet deployment with [Stellar Expert](https://stellar.expert/explorer/testnet).
 
 ---
 
@@ -49,7 +18,7 @@ TrusTrove is a decentralized trade finance protocol on Stellar. SMEs tokenize un
 |---|---|---|---|---|
 | | **Fuhad (K1NGD4VID)** | Founder & Lead Developer | [@k1ngd4vid](https://github.com/k1ngd4vid) | [@k1ngd4vid](https://t.me/k1ngd4vid) |
 
-Join the contributor community: **[t.me/trusttrove](https://t.me/trusttrove)**
+For security issues, follow the private reporting instructions in `SECURITY.md`. For code changes, use the contribution guidance in `CONTRIBUTING.md`.
 
 ### Maintainer Tooling
 
@@ -209,7 +178,7 @@ symbol() → String                    ← set at initialize()
 
 ## Architecture & Fund Flow
 
-The protocol employs a `pool_factory` + per-asset pool instance model. The `pool_factory` handles deploying and tracking an independent `pool_contract` instance for each supported funding asset (e.g., USDC, XLM). This design isolates risk, ensuring that a shortfall in one asset pool cannot cross-contaminate another. 
+The protocol employs a `pool_factory` + per-asset pool instance model. The `pool_factory` handles deploying and tracking an independent `pool_contract` instance for each supported funding asset (e.g., USDC, XLM). This design isolates risk, ensuring that a shortfall in one asset pool cannot cross-contaminate another.
 
 **Note**: This architecture explicitly supersedes closed issue #17's Option A/B question, resolved as Option B (parallel single-asset pools instead of a commingled multi-asset pool).
 
@@ -284,7 +253,7 @@ The pool contract is expected to call `escrow.release_to_issuer(invoice_id, issu
 Escrow ──[funded_amount USDC]──► Issuer
 ```
 
-**⚠️ This call is not yet wired into `fund_invoice` (see [Issue #56](https://github.com/TrusTrove/TrusTrove-contract/issues/56)).** In the current deployment, issuers do not automatically receive USDC after an invoice is funded. This is the highest-priority gap before mainnet.
+**⚠️ This call is not yet wired into `fund_invoice` (see Issue #56).** In the current deployment, issuers do not automatically receive USDC after an invoice is funded. This is the highest-priority gap before mainnet.
 
 #### Step 5 — Ship & Confirm (no funds move)
 The issuer calls `mark_shipped`. Then **both** the issuer and the buyer must independently call `confirm_delivery`. Only when both confirmations are recorded does the invoice advance to `Confirmed`.
@@ -382,8 +351,8 @@ rustup target add wasm32v1-none --toolchain 1.85.0
 ### 2. Clone and build
 
 ```bash
-git clone https://github.com/TrusTrove/TrusTrove-contract.git
-cd TrusTrove-contract
+git clone <repository-url>
+cd ClearLedger-contract
 rustup run 1.85.0 stellar contract build
 ```
 
@@ -415,7 +384,7 @@ Or on Windows (PowerShell):
 ./scripts/deploy.ps1
 ```
 
-The deploy script prints all four contract IDs at the end. Paste them into `TrusTrove-app/.env.local`.
+The deploy script prints all four contract IDs at the end. Paste them into `ClearLedger-app/.env.local`.
 
 #### Stellar CLI Setup (Linux, macOS, Windows)
 
@@ -433,7 +402,7 @@ The deploy script requires the Stellar CLI. Choose one:
 
 ## Known Centralization Risks & Roadmap
 
-TrusTrove is in active development on Stellar testnet. Several centralization trade-offs were made deliberately to ship a working protocol quickly. They are documented here so contributors and users understand the current trust model and can help drive the path to a more decentralized design.
+ClearLedger is in active development on Stellar testnet. Several centralization trade-offs were made deliberately to ship a working protocol quickly. They are documented here so contributors and users understand the current trust model and can help drive the path to a more decentralized design.
 
 ### Admin key controls critical operations
 
@@ -477,7 +446,7 @@ If you want to contribute to governance design, open an issue tagged `complexity
 
 ### Emergency pause mechanism (complete rollout)
 
-All four contracts — `pool`, `invoice`, `registry`, and `escrow` — expose admin-gated `pause() / unpause()` entry points backed by the shared [`trusttrove-pause`](contracts/pause) crate (issues #713, #714, #715, #716). While paused, every state-changing call reverts with `ContractPaused` while read-only views remain live.
+All four contracts — `pool`, `invoice`, `registry`, and `escrow` — expose admin-gated `pause() / unpause()` entry points backed by the shared [`clearledger-pause`](contracts/pause) crate (issues #713, #714, #715, #716). While paused, every state-changing call reverts with `ContractPaused` while read-only views remain live.
 
 The escrow covers `initialize`, `lock`, `release_to_issuer`, `release_to_pool`, and `handle_default`, so a compromised escrow admin or a stuck release path can be frozen without touching funds already locked — `get_locked` stays readable throughout.
 
@@ -520,7 +489,7 @@ fix(pool): guard against division by zero when total_shares is 0
 test(invoice): add full lifecycle integration test
 ```
 
-If you have questions, reach us on Telegram: **[t.me/trusttrove](https://t.me/trusttrove)**
+If you have questions, contact the project maintainers through the repository’s configured channels.
 
 ### Error Codes Reference
 
@@ -580,5 +549,5 @@ MIT — see [CHANGELOG.md](./CHANGELOG.md) for version history.
 
 ## Contributors
 
-[![Contributors](https://contrib.rocks/image?repo=TrusTrove/TrusTrove-contract)](https://github.com/TrusTrove/TrusTrove-contract/graphs/contributors)
+
 // fix
