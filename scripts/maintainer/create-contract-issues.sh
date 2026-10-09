@@ -1,10 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
-# Run from inside TrusTrove-contract repo root
+# Run from inside ClearLedger-contract repo root
 # Usage: bash create-contract-issues.sh
 
-REPO="TrusTrove/TrusTrove-contract"
+REPO="ClearLedger/ClearLedger-contract"
 
 # ── gh wrapper with exponential-backoff rate-limit handling ─────────────────
 gh_req() {
@@ -86,7 +86,7 @@ create_issue \
 create_issue \
   "test(registry): achieve 100% branch coverage on registry_contract" \
   "testing,good first issue,complexity:low" \
-  "## Summary\nThe registry contract currently has unit tests for happy paths only. This issue covers writing tests for all error branches.\n\n## Acceptance Criteria\n- [ ] Test \`AlreadyRegistered\` error on duplicate issuer registration\n- [ ] Test \`AlreadyRegistered\` error on duplicate buyer registration\n- [ ] Test \`NotFound\` error on \`get_profile\` for unknown address\n- [ ] Test \`NotAuthorized\` error on \`revoke\` called by non-admin\n- [ ] Test \`is_verified\` returns false for unknown address (no panic)\n- [ ] All tests pass with \`cargo test -p trusttrove-registry\`\n\n## Tech Stack\nRust · soroban-sdk testutils · Env::default() · mock_all_auths()"
+  "## Summary\nThe registry contract currently has unit tests for happy paths only. This issue covers writing tests for all error branches.\n\n## Acceptance Criteria\n- [ ] Test \`AlreadyRegistered\` error on duplicate issuer registration\n- [ ] Test \`AlreadyRegistered\` error on duplicate buyer registration\n- [ ] Test \`NotFound\` error on \`get_profile\` for unknown address\n- [ ] Test \`NotAuthorized\` error on \`revoke\` called by non-admin\n- [ ] Test \`is_verified\` returns false for unknown address (no panic)\n- [ ] All tests pass with \`cargo test -p clearledger-registry\`\n\n## Tech Stack\nRust · soroban-sdk testutils · Env::default() · mock_all_auths()"
 
 # ── INVOICE CONTRACT ──────────────────────────────────────────────────────────
 
@@ -103,7 +103,7 @@ create_issue \
 create_issue \
   "test(invoice): write full lifecycle integration test for invoice_contract" \
   "testing,complexity:high" \
-  "## Summary\nWrite a single end-to-end integration test that exercises the complete invoice lifecycle in one test function using the Soroban test environment.\n\n## Test Flow\n1. Deploy registry, invoice, escrow, and pool contracts\n2. Register issuer and buyer\n3. Create invoice\n4. List for financing\n5. Fund via pool\n6. Mark as shipped\n7. Confirm delivery (both parties)\n8. Repay\n9. Assert final status == Repaid\n10. Assert pool yield increased\n\n## Acceptance Criteria\n- [ ] Test lives in \`contracts/invoice/src/test.rs\`\n- [ ] All four contracts deployed and wired in the test environment\n- [ ] Assertions at every stage verify correct status transition\n- [ ] Test passes with \`cargo test -p trusttrove-invoice\`\n\n## Tech Stack\nRust · soroban-sdk testutils · env.register_contract()"
+  "## Summary\nWrite a single end-to-end integration test that exercises the complete invoice lifecycle in one test function using the Soroban test environment.\n\n## Test Flow\n1. Deploy registry, invoice, escrow, and pool contracts\n2. Register issuer and buyer\n3. Create invoice\n4. List for financing\n5. Fund via pool\n6. Mark as shipped\n7. Confirm delivery (both parties)\n8. Repay\n9. Assert final status == Repaid\n10. Assert pool yield increased\n\n## Acceptance Criteria\n- [ ] Test lives in \`contracts/invoice/src/test.rs\`\n- [ ] All four contracts deployed and wired in the test environment\n- [ ] Assertions at every stage verify correct status transition\n- [ ] Test passes with \`cargo test -p clearledger-invoice\`\n\n## Tech Stack\nRust · soroban-sdk testutils · env.register_contract()"
 
 create_issue \
   "feat(invoice): add early repayment support with partial discount refund" \

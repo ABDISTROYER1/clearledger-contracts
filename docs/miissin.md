@@ -4,7 +4,7 @@
 > **Applies to:** All four Soroban smart contracts (registry, invoice, escrow, pool)
 
 This document describes the trust assumptions, authentication gates, and
-attack surfaces of the TrusTrove protocol. It is intended for security
+attack surfaces of the ClearLedger protocol. It is intended for security
 researchers, integrators, and contributors evaluating the protocol's risk
 profile.
 
@@ -297,7 +297,4 @@ The following are explicitly outside this threat model:
 
 ## Reporting
 
-Report vulnerabilities to **security@trusttrove.xyz** or via the
-[Security Advisory](https://github.com/TrusTrove/TrusTrove-contract/security/advisories)
-tab. See [SECURITY.md](../SECURITY.md) for our disclosure policy and response
-timeline.
+Report vulnerabilities through this repository’s private security reporting channel. See [SECURITY.md](../SECURITY.md) for our disclosure policy and response timeline.

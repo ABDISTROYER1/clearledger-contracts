@@ -1,4 +1,4 @@
-$REPO = "TrusTrove/TrusTrove-contract"
+$REPO = "ClearLedger/ClearLedger-contract"
 
 Write-Host "Creating issues for $REPO..."
 
@@ -59,7 +59,7 @@ The registry contract currently has unit tests for happy paths only. This issue 
 - [ ] Test \`NotFound\` error on \`get_profile\` for unknown address
 - [ ] Test \`NotAuthorized\` error on \`revoke\` called by non-admin
 - [ ] Test \`is_verified\` returns false for unknown address (no panic)
-- [ ] All tests pass with \`cargo test -p trusttrove-registry\`
+- [ ] All tests pass with \`cargo test -p clearledger-registry\`
 
 ## Tech Stack
 Rust · soroban-sdk testutils · Env::default() · mock_all_auths()
@@ -132,7 +132,7 @@ Write a single end-to-end integration test that exercises the complete invoice l
 - [ ] Test lives in \`contracts/invoice/src/test.rs\`
 - [ ] All four contracts deployed and wired in the test environment
 - [ ] Assertions at every stage verify correct status transition
-- [ ] Test passes with \`cargo test -p trusttrove-invoice\`
+- [ ] Test passes with \`cargo test -p clearledger-invoice\`
 
 ## Tech Stack
 Rust · soroban-sdk testutils · env.register_contract()

@@ -153,7 +153,7 @@ pub struct Attestation {
 #[contracttype]
 #[derive(Clone, Debug)]
 pub struct AttestationPayload {
-    /// Domain separator binding this signature to TrusTrove attestations
+    /// Domain separator binding this signature to ClearLedger attestations
     /// specifically, so a signature can't be replayed against an unrelated
     /// contract or message scheme.
     pub domain_separator: BytesN<32>,

@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# deploy.ps1 — Idempotent deployment script for TrusTrove contracts (PowerShell)
+# deploy.ps1 — Idempotent deployment script for ClearLedger contracts (PowerShell)
 #
 # Usage:
 #   powershell ./scripts/deploy.ps1              # Normal deploy (skips already-deployed contracts)
@@ -26,8 +26,8 @@ foreach ($arg in $args) {
         '-fresh'    { $fresh = $true }
         '-resume'   { $resume = $true }
         '-dryrun'   { $dryRun = $true }
-        '-help'     { Write-Host "deploy.ps1 — Idempotent deployment script for TrusTrove contracts"; exit 0 }
-        '-h'        { Write-Host "deploy.ps1 — Idempotent deployment script for TrusTrove contracts"; exit 0 }
+        '-help'     { Write-Host "deploy.ps1 — Idempotent deployment script for ClearLedger contracts"; exit 0 }
+        '-h'        { Write-Host "deploy.ps1 — Idempotent deployment script for ClearLedger contracts"; exit 0 }
         default     { Write-Host "Unknown argument: $arg  (use -Help for usage)"; exit 1 }
     }
 }
@@ -263,40 +263,40 @@ Write-Host ""
 # ---------------------------------------------------------------------------
 
 Write-Host "=== Deploying registry_contract ==="
-$registryId = Deploy-Contract "registry" "target/wasm32v1-none/release/trusttrove_registry.wasm"
+$registryId = Deploy-Contract "registry" "target/wasm32v1-none/release/clearledger_registry.wasm"
 Write-Host "Registry: $registryId"
 
 Invoke-Init "registry" $registryId @("--", "initialize", "--admin", $deployerAddress)
 
 Write-Host "`n=== Deploying invoice_contract ==="
-$invoiceId = Deploy-Contract "invoice" "target/wasm32v1-none/release/trusttrove_invoice.wasm"
+$invoiceId = Deploy-Contract "invoice" "target/wasm32v1-none/release/clearledger_invoice.wasm"
 Write-Host "Invoice: $invoiceId"
 
 Invoke-Init "invoice" $invoiceId @("--", "initialize", "--admin", $deployerAddress, "--registry_contract", $registryId)
 
 Write-Host "`n=== Deploying USDC escrow_contract ==="
-$escrowUsdcId = Deploy-Contract "escrow_usdc" "target/wasm32v1-none/release/trusttrove_escrow.wasm"
+$escrowUsdcId = Deploy-Contract "escrow_usdc" "target/wasm32v1-none/release/clearledger_escrow.wasm"
 Write-Host "USDC Escrow: $escrowUsdcId"
 
 Write-Host "`n=== Deploying USDC pool_contract ==="
-$poolUsdcId = Deploy-Contract "pool_usdc" "target/wasm32v1-none/release/trusttrove_pool.wasm"
+$poolUsdcId = Deploy-Contract "pool_usdc" "target/wasm32v1-none/release/clearledger_pool.wasm"
 Write-Host "USDC Pool: $poolUsdcId"
 
 Invoke-Init "escrow_usdc" $escrowUsdcId @("--", "initialize", "--admin", $deployerAddress, "--pool_contract", $poolUsdcId, "--usdc_asset", $usdcIssuer)
 
-Invoke-Init "pool_usdc" $poolUsdcId @("--", "initialize", "--admin", $deployerAddress, "--invoice_contract", $invoiceId, "--escrow_contract", $escrowUsdcId, "--funding_asset", $usdcIssuer, "--registry_contract", $registryId, "--treasury", $deployerAddress, "--min_initial_deposit", "10000000", "--share_name", "`"TrusTrove USDC Pool Shares`"", "--share_symbol", "`"TT-USDC`"", "--share_decimals", "7")
+Invoke-Init "pool_usdc" $poolUsdcId @("--", "initialize", "--admin", $deployerAddress, "--invoice_contract", $invoiceId, "--escrow_contract", $escrowUsdcId, "--funding_asset", $usdcIssuer, "--registry_contract", $registryId, "--treasury", $deployerAddress, "--min_initial_deposit", "10000000", "--share_name", "`"ClearLedger USDC Pool Shares`"", "--share_symbol", "`"TT-USDC`"", "--share_decimals", "7")
 
 Write-Host "`n=== Deploying XLM escrow_contract (EXPERIMENTAL) ==="
-$escrowXlmId = Deploy-Contract "escrow_xlm" "target/wasm32v1-none/release/trusttrove_escrow.wasm"
+$escrowXlmId = Deploy-Contract "escrow_xlm" "target/wasm32v1-none/release/clearledger_escrow.wasm"
 Write-Host "XLM Escrow: $escrowXlmId"
 
 Write-Host "`n=== Deploying XLM pool_contract (EXPERIMENTAL) ==="
-$poolXlmId = Deploy-Contract "pool_xlm" "target/wasm32v1-none/release/trusttrove_pool.wasm"
+$poolXlmId = Deploy-Contract "pool_xlm" "target/wasm32v1-none/release/clearledger_pool.wasm"
 Write-Host "XLM Pool: $poolXlmId"
 
 Invoke-Init "escrow_xlm" $escrowXlmId @("--", "initialize", "--admin", $deployerAddress, "--pool_contract", $poolXlmId, "--usdc_asset", $xlmAsset)
 
-Invoke-Init "pool_xlm" $poolXlmId @("--", "initialize", "--admin", $deployerAddress, "--invoice_contract", $invoiceId, "--escrow_contract", $escrowXlmId, "--funding_asset", $xlmAsset, "--registry_contract", $registryId, "--treasury", $deployerAddress, "--min_initial_deposit", "10000000", "--share_name", "`"TrusTrove XLM Pool Shares`"", "--share_symbol", "`"TT-XLM`"", "--share_decimals", "7")
+Invoke-Init "pool_xlm" $poolXlmId @("--", "initialize", "--admin", $deployerAddress, "--invoice_contract", $invoiceId, "--escrow_contract", $escrowXlmId, "--funding_asset", $xlmAsset, "--registry_contract", $registryId, "--treasury", $deployerAddress, "--min_initial_deposit", "10000000", "--share_name", "`"ClearLedger XLM Pool Shares`"", "--share_symbol", "`"TT-XLM`"", "--share_decimals", "7")
 
 Write-Host "`n=== Wiring USDC pool_contract into invoice_contract ==="
 Invoke-Init "invoice_set_pool" $invoiceId @("--", "set_pool_contract", "--pool_contract", $poolUsdcId)
@@ -339,7 +339,7 @@ $envOut = ".env.deployed"
 $timestamp = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
 @"
 # Generated by deploy.ps1 on $timestamp
-# Copy these values into trusttrove-app .env.local
+# Copy these values into clearledger-app .env.local
 
 NEXT_PUBLIC_REGISTRY_CONTRACT_ID=$registryId
 NEXT_PUBLIC_INVOICE_CONTRACT_ID=$invoiceId
@@ -355,7 +355,7 @@ Write-Host ""
 Write-Host "Addresses saved to: $addressesFile"
 Write-Host "Frontend env saved to: $envOut"
 Write-Host ""
-Write-Host "Add to trusttrove-app .env.local:"
+Write-Host "Add to clearledger-app .env.local:"
 Write-Host ""
 Get-Content $envOut | ForEach-Object { Write-Host $_ }
 Write-Host "==========================================="

@@ -19,11 +19,11 @@ admins.
 ## Tests
 
 - [x] `cargo fmt --all -- --check`
-- [x] `cargo test -p trusttrove-invoice -p trusttrove-escrow`
-- [x] `cargo test -p trusttrove-pool -p trusttrove-registry -p trusttrove-integration-tests`
-- [x] `cargo test -p trusttrove-ttl`
+- [x] `cargo test -p clearledger-invoice -p clearledger-escrow`
+- [x] `cargo test -p clearledger-pool -p clearledger-registry -p clearledger-integration-tests`
+- [x] `cargo test -p clearledger-ttl`
 - [ ] `cargo test` — 10 existing `pool_factory` tests fail with
   `Func(MismatchingParameterLen)` during contract initialization; reproduced
-  when running `trusttrove-pool-factory` alone.
+  when running `clearledger-pool-factory` alone.
 
 Closes #727, #726, #723, #717

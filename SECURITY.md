@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-TrusTrove is currently in active development and deployed on Stellar testnet only.
+ClearLedger is currently in active development and deployed on Stellar testnet only.
 No mainnet deployment exists. Smart contracts have not undergone a formal audit.
 
 | Version | Supported |
@@ -32,9 +32,7 @@ The following are out of scope:
 
 **Do not open a public GitHub issue for security vulnerabilities.**
 
-Report vulnerabilities by emailing: **security@trusttrove.xyz**
-(If this address is not yet active, open a private GitHub Security Advisory
-via the Security tab on this repository.)
+Report vulnerabilities through the private reporting option in this repository’s Security tab.
 
 Include in your report:
 - Description of the vulnerability
@@ -53,7 +51,7 @@ Include in your report:
 
 ## Disclosure Policy
 
-TrusTrove follows coordinated disclosure. We ask that you give us reasonable
+ClearLedger follows coordinated disclosure. We ask that you give us reasonable
 time to assess and address a vulnerability before public disclosure.
 
 We will credit researchers who report valid vulnerabilities in our
@@ -61,7 +59,7 @@ We will credit researchers who report valid vulnerabilities in our
 
 ## Audit Status
 
-TrusTrove smart contracts have not been formally audited.
+ClearLedger smart contracts have not been formally audited.
 Users interact with testnet contracts at their own risk.
 A security audit is planned prior to any mainnet deployment.
 
@@ -73,5 +71,5 @@ A security audit is planned prior to any mainnet deployment.
 
 ## Important Notice
 
-TrusTrove is experimental software. Do not deposit real funds.
+ClearLedger is experimental software. Do not deposit real funds.
 All contracts operate on Stellar testnet with test USDC only.

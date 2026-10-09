@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Report a bug in TrusTrove contracts or tooling
+about: Report a bug in ClearLedger contracts or tooling
 title: "[Bug] "
 labels: bug
 assignees: ''

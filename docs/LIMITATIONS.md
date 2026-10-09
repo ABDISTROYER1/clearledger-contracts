@@ -1,7 +1,7 @@
 # Limitations
 
 > **Updated:** 2026-09-30
-> **Applies to:** TrusTrove protocol on Stellar testnet
+> **Applies to:** ClearLedger protocol on Stellar testnet
 
 This document captures known limitations, testnet-specific constraints,
 budget/cost estimates, unimplemented features, and edge cases that are not
@@ -90,7 +90,7 @@ relative costs based on code analysis.
 | `escrow::handle_default` | 0 | 1 (escrow → pool) | — | — | Medium |
 
 Every mutating entry point above also reads the shared pause flag
-(`trusttrove-pause`), adding one instance-storage read per call. That read is
+(`clearledger-pause`), adding one instance-storage read per call. That read is
 instance-local and costs the same in every contract; it is also what pushed a few
 long-running integration tests past the default _test-host_ budget, which is why
 `pool_factory`'s test `setup()` lifts that budget — see
@@ -197,7 +197,7 @@ FIFO/HIFO tax or reporting policy.
 After `fund_invoice` locks USDC in escrow, the pooled funds should be
 released to the issuer via `escrow.release_to_issuer()`. This call is
 **not yet wired** into `fund_invoice`. See
-[Issue #56](https://github.com/TrusTrove/TrusTrove-contract/issues/56).
+Issue #56.
 **Status:** Unresolved. This is the highest-priority gap before mainnet.
 **Workaround:** An admin or automated off-chain bot must call
 `escrow.release_to_issuer(invoice_id, issuer)` separately after funding.
@@ -254,7 +254,7 @@ are provided where available.
 
 ### UI / Frontend
 
-- Event-driven Go indexer (see [TrusTrove-app](https://github.com/TrusTrove/TrusTrove-app))
+- Event-driven Go indexer (see ClearLedger-app)
 - Transaction simulation before signature
 
 ### Smart Contracts
@@ -291,7 +291,7 @@ These limitations were previously listed here but have been fixed since
 the 2025-07-25 revision.
 
 > **Correction (issue
-> [#835](https://github.com/TrusTrove/TrusTrove-contract/issues/835)):**
+> #835):**
 > An earlier entry here claimed that "Index entries not compacted on status
 > transition" was resolved because `move_status_index` performs O(1)
 > membership checks via `DataKey::StatusMembership` (crediting PR #121).
@@ -301,7 +301,7 @@ the 2025-07-25 revision.
 > and `get_by_status` skips stale rows only by loading each invoice and
 > comparing its status. The item remains open and the O(n) linear-scan
 > behaviour is tracked in
-> [#831](https://github.com/TrusTrove/TrusTrove-contract/issues/831);
+> #831;
 > this document will be updated again when that lands.
 
 - **Pool does not track individual LP yield accrual.** `pool::withdraw`
@@ -322,18 +322,18 @@ the 2025-07-25 revision.
 
 ## Related Issues
 
-- [#56 — Wire issuer release into fund_invoice](https://github.com/TrusTrove/TrusTrove-contract/issues/56) (open)
-- [#285 — Event schema documentation](https://github.com/TrusTrove/TrusTrove-contract/issues/285)
-- [#286 — Gas budget report](https://github.com/TrusTrove/TrusTrove-contract/issues/286)
-- [#287 — Storage schema docs](https://github.com/TrusTrove/TrusTrove-contract/issues/287)
-- [#294 — Testnet limitation docs](https://github.com/TrusTrove/TrusTrove-contract/issues/294)
-- [#307 — General repo documentation](https://github.com/TrusTrove/TrusTrove-contract/issues/307)
-- [#460 — LIMITATIONS.md stale date](https://github.com/TrusTrove/TrusTrove-contract/issues/460) (this PR fixes it)
-- [#831 — Index helpers linearly scan whole indexes](https://github.com/TrusTrove/TrusTrove-contract/issues/831) (open — tracks the linear-scan performance work; update this document when a real index/membership structure lands)
-- [#835 — LIMITATIONS.md documents a `DataKey::StatusMembership` that does not exist](https://github.com/TrusTrove/TrusTrove-contract/issues/835) (this PR fixes it)
+- #56 — Wire issuer release into fund_invoice (open)
+- #285 — Event schema documentation
+- #286 — Gas budget report
+- #287 — Storage schema docs
+- #294 — Testnet limitation docs
+- #307 — General repo documentation
+- #460 — LIMITATIONS.md stale date (this PR fixes it)
+- #831 — Index helpers linearly scan whole indexes (open — tracks the linear-scan performance work; update this document when a real index/membership structure lands)
+- #835 — LIMITATIONS.md documents a `DataKey::StatusMembership` that does not exist (this PR fixes it)
 
 Resolved items reference the PRs that closed them:
 
-- Issue #67 — status index filtering (closed by PR #121; the O(1) membership claim was retracted — see [#835](https://github.com/TrusTrove/TrusTrove-contract/issues/835) and [#831](https://github.com/TrusTrove/TrusTrove-contract/issues/831))
+- Issue #67 — status index filtering (closed by PR #121; the O(1) membership claim was retracted — see #835 and #831)
 - Issues #94, #96, #98, #103 — security (closed by PR #124)
 - Partial default repayment (closed by PR #120)

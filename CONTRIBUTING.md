@@ -1,7 +1,7 @@
-# Contributing to TrusTrove Contracts
+# Contributing to ClearLedger Contracts
 
 
-Thank you for contributing to TrusTrove's Soroban contracts. Keep changes focused,
+Thank you for contributing to ClearLedger's Soroban contracts. Keep changes focused,
 tested, and tied to an issue.
 
 
@@ -52,7 +52,7 @@ Run the affected crate first for quick feedback:
 
 
 ```bash
-cargo test -p trusttrove-registry
+cargo test -p clearledger-registry
 ```
 
 

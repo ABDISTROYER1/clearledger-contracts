@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# verify.ps1 — Post-deployment verification script for TrusTrove contracts (PowerShell)
+# verify.ps1 — Post-deployment verification script for ClearLedger contracts (PowerShell)
 #
 # Usage:
 #   powershell ./scripts/verify.ps1

@@ -5,12 +5,12 @@ use soroban_sdk::{
     xdr::ToXdr, Address, BytesN, Env, Map, String, Symbol,
 };
 
-use trusttrove_escrow::{EscrowContract, EscrowContractClient};
-use trusttrove_invoice::{InvoiceContract, InvoiceContractClient, InvoiceStatus};
-use trusttrove_pool::{
+use clearledger_escrow::{EscrowContract, EscrowContractClient};
+use clearledger_invoice::{InvoiceContract, InvoiceContractClient, InvoiceStatus};
+use clearledger_pool::{
     PoolContract, PoolContractClient, DEFAULT_MIN_INITIAL_DEPOSIT, DEFAULT_SHARE_DECIMALS,
 };
-use trusttrove_registry::{RegistryContract, RegistryContractClient};
+use clearledger_registry::{RegistryContract, RegistryContractClient};
 
 // --------------- Mock USDC Token ---------------
 
@@ -91,7 +91,7 @@ fn setup_fee_lifecycle() -> FeeLifecycle {
     let agent_reg_id = env.register_contract(None, MockAgentRegistry);
     MockAgentRegistryClient::new(&env, &agent_reg_id).register_agent(
         &test_agent_id(&env),
-        &trusttrove_invoice::Agent {
+        &clearledger_invoice::Agent {
             active: true,
             pubkey: test_agent_pubkey(&env),
         },
@@ -109,7 +109,7 @@ fn setup_fee_lifecycle() -> FeeLifecycle {
         &registry_id,
         &admin,
         &DEFAULT_MIN_INITIAL_DEPOSIT,
-        &String::from_str(&env, "TrusTrove USDC Pool Shares"),
+        &String::from_str(&env, "ClearLedger USDC Pool Shares"),
         &String::from_str(&env, "TT-USDC"),
         &DEFAULT_SHARE_DECIMALS,
     );
@@ -187,7 +187,7 @@ fn assert_fee_settlement(lifecycle: &FeeLifecycle, expected: FeeSettlementExpect
     assert_eq!(token.balance(&lifecycle.escrow_id), 9_800_000_000);
 }
 
-fn expected_repayment_split(invoice: &trusttrove_invoice::Invoice, repaid_at: u64) -> (u128, u128) {
+fn expected_repayment_split(invoice: &clearledger_invoice::Invoice, repaid_at: u64) -> (u128, u128) {
     let funded_at = invoice
         .funded_at
         .expect("funded invoice should record its funding timestamp");
@@ -210,11 +210,11 @@ pub struct MockAgentRegistry;
 
 #[contractimpl]
 impl MockAgentRegistry {
-    pub fn get_agent(env: Env, agent_id: Symbol) -> Option<trusttrove_invoice::Agent> {
+    pub fn get_agent(env: Env, agent_id: Symbol) -> Option<clearledger_invoice::Agent> {
         env.storage().persistent().get(&AgentKey(agent_id))
     }
 
-    pub fn register_agent(env: Env, agent_id: Symbol, agent: trusttrove_invoice::Agent) {
+    pub fn register_agent(env: Env, agent_id: Symbol, agent: clearledger_invoice::Agent) {
         env.storage().persistent().set(&AgentKey(agent_id), &agent);
     }
 }
@@ -242,10 +242,10 @@ fn test_agent_id(env: &Env) -> Symbol {
 }
 
 fn attest_invoice(env: &Env, invoice_client: &InvoiceContractClient, invoice_id: &BytesN<32>) {
-    let payload = trusttrove_invoice::AttestationPayload {
+    let payload = clearledger_invoice::AttestationPayload {
         domain_separator: BytesN::from_array(
             env,
-            &trusttrove_invoice::ATTESTATION_DOMAIN_SEPARATOR,
+            &clearledger_invoice::ATTESTATION_DOMAIN_SEPARATOR,
         ),
         invoice_id: invoice_id.clone(),
         risk_score: 5000,
@@ -320,7 +320,7 @@ fn test_cross_contract_invoice_pool_escrow_lifecycle() {
     let agent_reg = MockAgentRegistryClient::new(&env, &agent_reg_id);
     agent_reg.register_agent(
         &test_agent_id(&env),
-        &trusttrove_invoice::Agent {
+        &clearledger_invoice::Agent {
             active: true,
             pubkey: test_agent_pubkey(&env),
         },
@@ -339,7 +339,7 @@ fn test_cross_contract_invoice_pool_escrow_lifecycle() {
         &registry_id,
         &admin,
         &DEFAULT_MIN_INITIAL_DEPOSIT,
-        &String::from_str(&env, "TrusTrove USDC Pool Shares"),
+        &String::from_str(&env, "ClearLedger USDC Pool Shares"),
         &String::from_str(&env, "TT-USDC"),
         &DEFAULT_SHARE_DECIMALS,
     );
@@ -482,7 +482,7 @@ fn test_cross_contract_unauthorized_pool_setter_rejected() {
         &registry_id,
         &admin,
         &DEFAULT_MIN_INITIAL_DEPOSIT,
-        &String::from_str(&env, "TrusTrove USDC Pool Shares"),
+        &String::from_str(&env, "ClearLedger USDC Pool Shares"),
         &String::from_str(&env, "TT-USDC"),
         &DEFAULT_SHARE_DECIMALS,
     );
@@ -541,7 +541,7 @@ fn test_cross_contract_partial_repayment_lifecycle() {
     let agent_reg = MockAgentRegistryClient::new(&env, &agent_reg_id);
     agent_reg.register_agent(
         &test_agent_id(&env),
-        &trusttrove_invoice::Agent {
+        &clearledger_invoice::Agent {
             active: true,
             pubkey: test_agent_pubkey(&env),
         },
@@ -560,7 +560,7 @@ fn test_cross_contract_partial_repayment_lifecycle() {
         &registry_id,
         &admin,
         &DEFAULT_MIN_INITIAL_DEPOSIT,
-        &String::from_str(&env, "TrusTrove USDC Pool Shares"),
+        &String::from_str(&env, "ClearLedger USDC Pool Shares"),
         &String::from_str(&env, "TT-USDC"),
         &DEFAULT_SHARE_DECIMALS,
     );
@@ -694,7 +694,7 @@ fn test_partial_repayment_then_default_lifecycle() {
     let agent_reg = MockAgentRegistryClient::new(&env, &agent_reg_id);
     agent_reg.register_agent(
         &test_agent_id(&env),
-        &trusttrove_invoice::Agent {
+        &clearledger_invoice::Agent {
             active: true,
             pubkey: test_agent_pubkey(&env),
         },
@@ -713,7 +713,7 @@ fn test_partial_repayment_then_default_lifecycle() {
         &registry_id,
         &admin,
         &DEFAULT_MIN_INITIAL_DEPOSIT,
-        &String::from_str(&env, "TrusTrove USDC Pool Shares"),
+        &String::from_str(&env, "ClearLedger USDC Pool Shares"),
         &String::from_str(&env, "TT-USDC"),
         &DEFAULT_SHARE_DECIMALS,
     );
@@ -890,7 +890,7 @@ fn test_partial_repayment_then_default_pool_loss_calculation() {
     let agent_reg = MockAgentRegistryClient::new(&env, &agent_reg_id);
     agent_reg.register_agent(
         &test_agent_id(&env),
-        &trusttrove_invoice::Agent {
+        &clearledger_invoice::Agent {
             active: true,
             pubkey: test_agent_pubkey(&env),
         },
@@ -909,7 +909,7 @@ fn test_partial_repayment_then_default_pool_loss_calculation() {
         &registry_id,
         &admin,
         &DEFAULT_MIN_INITIAL_DEPOSIT,
-        &String::from_str(&env, "TrusTrove USDC Pool Shares"),
+        &String::from_str(&env, "ClearLedger USDC Pool Shares"),
         &String::from_str(&env, "TT-USDC"),
         &DEFAULT_SHARE_DECIMALS,
     );

@@ -4,7 +4,7 @@
 > **Applies to:** All four Soroban smart contracts
 
 This document describes the on-chain storage layout for every contract in the
-TrusTrove protocol. Integrators, indexer operators, and contributors should
+ClearLedger protocol. Integrators, indexer operators, and contributors should
 refer to this when designing off-chain read paths or auditing storage usage.
 
 ---
@@ -229,7 +229,7 @@ Cancelled = 8   // issuer cancelled before listing
 | `PoolContract` | `Address` | Authorised pool contract | `initialize()` |
 | `InvoiceContract` | `Address` | Invoice contract address | `initialize()` |
 | `UsdcAsset` | `Address` | USDC token contract address | `initialize()` |
-| `Paused` | `bool` | Emergency circuit-breaker flag, via `trusttrove_pause::PauseState::Paused` (issue #716). Absent means not paused. | `pause()` / `unpause()` |
+| `Paused` | `bool` | Emergency circuit-breaker flag, via `clearledger_pause::PauseState::Paused` (issue #716). Absent means not paused. | `pause()` / `unpause()` |
 
 ### Persistent Storage
 

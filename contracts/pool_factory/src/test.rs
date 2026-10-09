@@ -9,10 +9,10 @@ use soroban_sdk::{
     xdr::ToXdr,
     Address, Bytes, BytesN, Env, Map, String, Symbol, TryFromVal,
 };
-use trusttrove_escrow::EscrowContractClient;
-use trusttrove_invoice::InvoiceContractClient;
-use trusttrove_pool::PoolContractClient;
-use trusttrove_registry::{RegistryContract, RegistryContractClient};
+use clearledger_escrow::EscrowContractClient;
+use clearledger_invoice::InvoiceContractClient;
+use clearledger_pool::PoolContractClient;
+use clearledger_registry::{RegistryContract, RegistryContractClient};
 
 use crate::{
     DataKey, PoolFactoryContract, PoolFactoryContractClient, DEFAULT_MIN_INITIAL_DEPOSIT,
@@ -57,7 +57,7 @@ fn setup() -> TestEnv {
     // Real invoice and escrow contracts: the pool's `initialize` cross-checks
     // the escrow's configured asset and the factory reads the invoice's
     // registry, so both have to be real contracts for the round trip to work.
-    let invoice_id = env.register_contract(None, trusttrove_invoice::InvoiceContract);
+    let invoice_id = env.register_contract(None, clearledger_invoice::InvoiceContract);
     let invoice = InvoiceContractClient::new(&env, &invoice_id);
     invoice.initialize(&admin, &registry_id);
 
@@ -90,7 +90,7 @@ fn setup() -> TestEnv {
 /// factory only deploys and wires pools, it never moves funds), so a generated
 /// address stands in for it.
 fn new_escrow(env: &Env, admin: &Address, asset: &Address) -> Address {
-    let escrow_id = env.register_contract(None, trusttrove_escrow::EscrowContract);
+    let escrow_id = env.register_contract(None, clearledger_escrow::EscrowContract);
     let escrow = EscrowContractClient::new(env, &escrow_id);
     escrow.initialize(admin, &Address::generate(env), asset);
     escrow_id
@@ -118,7 +118,7 @@ fn register_asset(te: &TestEnv, asset: &Address) -> Address {
 fn new_initialized_pool(te: &TestEnv, asset: &Address) -> Address {
     let pool_address = te
         .env
-        .register_contract(None, trusttrove_pool::PoolContract);
+        .register_contract(None, clearledger_pool::PoolContract);
     let escrow_id = if *asset == te.asset {
         te.escrow_id.clone()
     } else {
@@ -140,13 +140,13 @@ fn new_initialized_pool(te: &TestEnv, asset: &Address) -> Address {
 }
 
 fn new_escrow_for_pool(env: &Env, admin: &Address, asset: &Address, pool: &Address) -> Address {
-    let escrow_id = env.register_contract(None, trusttrove_escrow::EscrowContract);
+    let escrow_id = env.register_contract(None, clearledger_escrow::EscrowContract);
     let escrow = EscrowContractClient::new(env, &escrow_id);
     escrow.initialize(admin, pool, asset);
     escrow_id
 }
 
-/// The `trusttrove_pool.wasm` artifact that `register_asset` deploys.
+/// The `clearledger_pool.wasm` artifact that `register_asset` deploys.
 ///
 /// `register_asset` deploys through `Env::deployer()` and then invokes
 /// `initialize` on the fresh instance. The SDK 21 test host can only dispatch
@@ -169,7 +169,7 @@ fn new_escrow_for_pool(env: &Env, admin: &Address, asset: &Address, pool: &Addre
 fn pool_wasm() -> &'static [u8] {
     static WASM: OnceLock<std::vec::Vec<u8>> = OnceLock::new();
     WASM.get_or_init(|| {
-        const WASM_FILE: &str = "trusttrove_pool.wasm";
+        const WASM_FILE: &str = "clearledger_pool.wasm";
 
         let manifest_dir =
             PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR"));
@@ -191,7 +191,7 @@ fn pool_wasm() -> &'static [u8] {
                 .args([
                     "build",
                     "--package",
-                    "trusttrove-pool",
+                    "clearledger-pool",
                     "--release",
                     "--target",
                     "wasm32v1-none",
@@ -207,10 +207,10 @@ fn pool_wasm() -> &'static [u8] {
                 .env_remove("CARGO_ENCODED_RUSTFLAGS")
                 .env_remove("RUSTDOCFLAGS")
                 .status()
-                .expect("failed to run cargo to build the trusttrove-pool Wasm");
+                .expect("failed to run cargo to build the clearledger-pool Wasm");
             assert!(
                 status.success(),
-                "building the trusttrove-pool Wasm failed ({status}); the \
+                "building the clearledger-pool Wasm failed ({status}); the \
                  wasm32v1-none target is required, install it with \
                  `rustup target add wasm32v1-none`"
             );
@@ -298,7 +298,7 @@ fn test_register_asset_deploys_and_initializes_pool() {
             te.env
                 .storage()
                 .instance()
-                .get(&trusttrove_pool::DataKey::RegistryContract)
+                .get(&clearledger_pool::DataKey::RegistryContract)
         })
         .expect("pool instance should record a registry contract");
     assert_eq!(registry, te.registry_id);
@@ -399,7 +399,7 @@ fn test_register_asset_with_uninitialized_invoice_panics() {
     // deploying a pool pointed at nothing.
     let uninitialized_invoice = te
         .env
-        .register_contract(None, trusttrove_invoice::InvoiceContract);
+        .register_contract(None, clearledger_invoice::InvoiceContract);
 
     te.factory.register_asset(
         &te.asset,
@@ -665,11 +665,11 @@ pub struct MockAgentRegistry;
 
 #[contractimpl]
 impl MockAgentRegistry {
-    pub fn get_agent(env: Env, agent_id: Symbol) -> Option<trusttrove_invoice::Agent> {
+    pub fn get_agent(env: Env, agent_id: Symbol) -> Option<clearledger_invoice::Agent> {
         env.storage().persistent().get(&AgentKey(agent_id))
     }
 
-    pub fn register_agent(env: Env, agent_id: Symbol, agent: trusttrove_invoice::Agent) {
+    pub fn register_agent(env: Env, agent_id: Symbol, agent: clearledger_invoice::Agent) {
         env.storage().persistent().set(&AgentKey(agent_id), &agent);
     }
 }
@@ -692,17 +692,17 @@ fn attest_invoice(env: &Env, invoice: &InvoiceContractClient, invoice_id: &Bytes
     let agent_registry = MockAgentRegistryClient::new(env, &agent_registry_id);
     agent_registry.register_agent(
         &agent_id,
-        &trusttrove_invoice::Agent {
+        &clearledger_invoice::Agent {
             active: true,
             pubkey: BytesN::from_array(env, &public_key_bytes),
         },
     );
     invoice.set_agent_registry_contract(&agent_registry_id);
 
-    let payload = trusttrove_invoice::AttestationPayload {
+    let payload = clearledger_invoice::AttestationPayload {
         domain_separator: BytesN::from_array(
             env,
-            &trusttrove_invoice::ATTESTATION_DOMAIN_SEPARATOR,
+            &clearledger_invoice::ATTESTATION_DOMAIN_SEPARATOR,
         ),
         invoice_id: invoice_id.clone(),
         risk_score: 5000,
@@ -737,7 +737,7 @@ fn create_listed_invoice(
     invoice_id
 }
 
-fn assert_pool_stats_equal(actual: crate::types::PoolStats, expected: trusttrove_pool::PoolStats) {
+fn assert_pool_stats_equal(actual: crate::types::PoolStats, expected: clearledger_pool::PoolStats) {
     assert_eq!(actual.total_deposits, expected.total_deposits);
     assert_eq!(actual.total_funded, expected.total_funded);
     assert_eq!(actual.available_liquidity, expected.available_liquidity);

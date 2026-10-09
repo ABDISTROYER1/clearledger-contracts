@@ -60,10 +60,10 @@ jobs:
           ls -lh target/wasm32v1-none/release/*.wasm 2>/dev/null || true
           echo ""
           echo "Checking against budget..."
-          REGISTRY=$(wc -c < target/wasm32v1-none/release/trusttrove_registry.wasm 2>/dev/null || echo 0)
-          INVOICE=$(wc -c < target/wasm32v1-none/release/trusttrove_invoice.wasm 2>/dev/null || echo 0)
-          ESCROW=$(wc -c < target/wasm32v1-none/release/trusttrove_escrow.wasm 2>/dev/null || echo 0)
-          POOL=$(wc -c < target/wasm32v1-none/release/trusttrove_pool.wasm 2>/dev/null || echo 0)
+          REGISTRY=$(wc -c < target/wasm32v1-none/release/clearledger_registry.wasm 2>/dev/null || echo 0)
+          INVOICE=$(wc -c < target/wasm32v1-none/release/clearledger_invoice.wasm 2>/dev/null || echo 0)
+          ESCROW=$(wc -c < target/wasm32v1-none/release/clearledger_escrow.wasm 2>/dev/null || echo 0)
+          POOL=$(wc -c < target/wasm32v1-none/release/clearledger_pool.wasm 2>/dev/null || echo 0)
 
           # Budget in bytes (adjust as needed; Soroban charges by size)
           REGISTRY_BUDGET=1048576  # 1 MB
@@ -155,5 +155,5 @@ jobs:
           key: integration-test
 
       - name: Run cross-contract integration tests
-        run: cargo test -p trusttrove-integration-tests -- --nocapture
+        run: cargo test -p clearledger-integration-tests -- --nocapture
 
