@@ -219,42 +219,52 @@ deploy_contract() {
   existing=$(load_address "$key")
 
   if [ -n "$existing" ]; then
-    echo "  $key already deployed at $existing — skipping."
+    echo "  $key already deployed at $existing — skipping." >&2
     echo "$existing"
     return 0
   fi
 
   if [ "$DRY_RUN" = true ]; then
-    echo "  [DRY-RUN] Would deploy $key from $wasm"
+    echo "  [DRY-RUN] Would deploy $key from $wasm" >&2
     echo "<dry-run>"
     return 0
   fi
 
   if [ ! -f "$wasm" ]; then
-    echo "ERROR: WASM file not found: $wasm"
-    echo "       Run 'stellar contract build' first, or check the build output."
+    echo "ERROR: WASM file not found: $wasm" >&2
+    echo "       Run 'stellar contract build' first, or check the build output." >&2
     return 1
   fi
 
-  echo "  Deploying $key from $wasm ..."
-  local contract_id
-  if ! contract_id=$("$STELLAR" contract deploy \
+  echo "  Deploying $key from $wasm ..." >&2
+  local deploy_output contract_id
+  if ! deploy_output=$("$STELLAR" contract deploy \
       --wasm "$wasm" \
       --source "$DEPLOYER_ACCOUNT" \
       --network testnet 2>&1); then
-    echo "ERROR: Deploy failed for $key:"
-    echo "  $contract_id"
-    echo "  Fix the error above and rerun — already-deployed contracts will be skipped."
+    echo "ERROR: Deploy failed for $key:" >&2
+    echo "  $deploy_output" >&2
+    echo "  Fix the error above and rerun — already-deployed contracts will be skipped." >&2
+    return 1
+  fi
+
+  # Stellar CLI prints transaction details as well as the contract address.
+  # Keep only the address so callers using command substitution receive a
+  # valid contract ID rather than the progress log.
+  contract_id=$(printf '%s\n' "$deploy_output" | grep -Eo 'C[A-Z2-7]{55}' | tail -n 1)
+  if [ -z "$contract_id" ]; then
+    echo "ERROR: Deploy output for $key did not contain a contract address:" >&2
+    echo "  $deploy_output" >&2
     return 1
   fi
 
   # Confirm the contract is visible on-chain before saving
-  if ! wait_for_contract "$contract_id"; then
+  if ! wait_for_contract "$contract_id" >&2; then
     return 1
   fi
 
   save_address "$key" "$contract_id"
-  echo "  Saved: $key=$contract_id"
+  echo "  Saved: $key=$contract_id" >&2
   echo "$contract_id"
 }
 
