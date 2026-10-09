@@ -112,6 +112,12 @@ while [ $_i -lt ${#_args[@]} ]; do
   _i=$((_i + 1))
 done
 
+# XLM contracts are experimental. Opt in only when their testnet asset is ready.
+DEPLOY_XLM="${DEPLOY_XLM:-false}"
+if [ "$ONLY_CONTRACT" = "escrow_xlm" ] || [ "$ONLY_CONTRACT" = "pool_xlm" ]; then
+  DEPLOY_XLM=true
+fi
+
 # Prefer a globally available `stellar` on PATH, fall back to STELLAR_BIN env var,
 # then fall back to a common WSL installation
 if command -v stellar &> /dev/null; then
@@ -187,8 +193,7 @@ wait_for_contract() {
   while [ $attempt -lt $max_attempts ]; do
     if "$STELLAR" contract fetch \
         --id "$contract_id" \
-        --network testnet \
-        --output xdr > /dev/null 2>&1; then
+        --network testnet > /dev/null 2>&1; then
       echo "  Confirmed."
       return 0
     fi
@@ -330,7 +335,7 @@ if [ -z "${USDC_ISSUER:-}" ]; then
   exit 1
 fi
 
-if [ -z "${XLM_ASSET:-}" ]; then
+if [ "$DEPLOY_XLM" = true ] && [ -z "${XLM_ASSET:-}" ]; then
   echo "ERROR: XLM_ASSET is not set.  Check your .env file."
   exit 1
 fi
@@ -344,6 +349,7 @@ echo "  Deployer address : $DEPLOYER_ADDRESS"
 echo "  Addresses file   : $ADDRESSES_FILE"
 echo "  Fresh deploy     : $FRESH"
 echo "  Dry-run mode     : $DRY_RUN"
+echo "  Deploy XLM       : $DEPLOY_XLM"
 if [ -n "$ONLY_CONTRACT" ]; then echo "  Only deploying   : $ONLY_CONTRACT"; fi
 echo ""
 
@@ -362,6 +368,9 @@ echo ""
 # ---------------------------------------------------------------------------
 # 7. Deploy & initialize all contracts
 # ---------------------------------------------------------------------------
+
+ESCROW_XLM_ID=""
+POOL_XLM_ID=""
 
 # In --only mode, load all existing saved addresses first so cross-contract
 # references remain valid even when only one contract is redeployed.
@@ -463,21 +472,21 @@ if _should_run "pool_usdc"; then
     --share_decimals 7
 fi
 
-if _should_run "escrow_xlm"; then
+if [ "$DEPLOY_XLM" = true ] && _should_run "escrow_xlm"; then
   echo ""
   echo "=== Deploying XLM escrow_contract (EXPERIMENTAL) ==="
   ESCROW_XLM_ID=$(deploy_contract "escrow_xlm" "target/wasm32v1-none/release/clearledger_escrow.wasm")
   echo "XLM Escrow: $ESCROW_XLM_ID"
 fi
 
-if _should_run "pool_xlm"; then
+if [ "$DEPLOY_XLM" = true ] && _should_run "pool_xlm"; then
   echo ""
   echo "=== Deploying XLM pool_contract (EXPERIMENTAL) ==="
   POOL_XLM_ID=$(deploy_contract "pool_xlm" "target/wasm32v1-none/release/clearledger_pool.wasm")
   echo "XLM Pool: $POOL_XLM_ID"
 fi
 
-if _should_run "escrow_xlm"; then
+if [ "$DEPLOY_XLM" = true ] && _should_run "escrow_xlm"; then
   invoke_init "escrow_xlm" "$ESCROW_XLM_ID" \
     -- initialize \
     --admin "$DEPLOYER_ADDRESS" \
@@ -485,7 +494,7 @@ if _should_run "escrow_xlm"; then
     --usdc_asset "$XLM_ASSET"
 fi
 
-if _should_run "pool_xlm"; then
+if [ "$DEPLOY_XLM" = true ] && _should_run "pool_xlm"; then
   invoke_init "pool_xlm" "$POOL_XLM_ID" \
     -- initialize \
     --admin "$DEPLOYER_ADDRESS" \
@@ -525,11 +534,13 @@ invoke_init "invoice_add_asset_usdc" "$INVOICE_ID" \
   -- add_supported_asset \
   --asset "$USDC_ISSUER"
 
-echo ""
-echo "=== Allow-listing XLM as a supported funding asset (EXPERIMENTAL) ==="
-invoke_init "invoice_add_asset_xlm" "$INVOICE_ID" \
-  -- add_supported_asset \
-  --asset "$XLM_ASSET"
+if [ "$DEPLOY_XLM" = true ]; then
+  echo ""
+  echo "=== Allow-listing XLM as a supported funding asset (EXPERIMENTAL) ==="
+  invoke_init "invoice_add_asset_xlm" "$INVOICE_ID" \
+    -- add_supported_asset \
+    --asset "$XLM_ASSET"
+fi
 
 # Agent-registry wiring is optional: it is only performed when
 # AGENT_REGISTRY_CONTRACT is set in .env / .env.example.  Without it,

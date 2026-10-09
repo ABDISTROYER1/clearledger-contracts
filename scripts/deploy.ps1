@@ -116,7 +116,9 @@ function Wait-ForContract {
 
     Write-Host "  Waiting for contract $contractId to be confirmed on-chain..."
     while ($attempt -lt $maxAttempts) {
-        $output = & $stellar contract fetch --id $contractId --network testnet --output xdr 2>&1
+        $wasmPath = Join-Path ([System.IO.Path]::GetTempPath()) "clearledger-$contractId.wasm"
+        $output = & $stellar contract fetch --id $contractId --network testnet --out-file $wasmPath 2>&1
+        if (Test-Path $wasmPath) { Remove-Item $wasmPath -Force }
         if ($LASTEXITCODE -eq 0) {
             Write-Host "  Confirmed."
             return $true

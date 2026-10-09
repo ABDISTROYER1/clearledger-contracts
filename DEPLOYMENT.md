@@ -25,6 +25,7 @@ Copy `.env.example` to `.env` and fill in:
 | `DEPLOYER_ACCOUNT` | Key alias for the deployer (default: `deployer`) |
 | `USDC_ISSUER` | Stellar address of the USDC issuer on testnet |
 | `XLM_ASSET` | XLM asset contract address (or native) - EXPERIMENTAL/INCOMPLETE |
+| `DEPLOY_XLM` | Set to `true` to opt in to experimental XLM contracts; defaults to the supported USDC workflow |
 
 ## Testnet Deployment
 
