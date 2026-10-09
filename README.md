@@ -12,11 +12,6 @@ See [contract architecture](docs/NEW_DESIGN.md), [deployment guidance](DEPLOYMEN
 
 ---
 
-## Maintainers
-
-| | Name | Role | GitHub | Telegram |
-|---|---|---|---|---|
-| | **Fuhad (K1NGD4VID)** | Founder & Lead Developer | [@k1ngd4vid](https://github.com/k1ngd4vid) | [@k1ngd4vid](https://t.me/k1ngd4vid) |
 
 For security issues, follow the private reporting instructions in `SECURITY.md`. For code changes, use the contribution guidance in `CONTRIBUTING.md`.
 
